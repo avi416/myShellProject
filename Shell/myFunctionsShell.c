@@ -97,23 +97,31 @@ void logout(char *input)
 
 void systemCall(char **arguments)
 {
-    puts("systemCall");
-    pid_t pid = fork();
-    if (pid == -1)
+    if (arguments[0] == NULL)
     {
-        perror("fork err");
+        fprintf(stderr, "Error: No command provided.\n");
         return;
     }
 
-    if (pid == 0)
+    pid_t pid = fork();
+    if (pid < 0)
     {
-
-        if (execvp(arguments[0], arguments) == -1)
-        {
-            exit(EXIT_FAILURE);
-        }
+        perror("Fork failed");
+        return;
+    }
+    
+    if (pid == 0) // Child process
+    {
+        execvp(arguments[0], arguments);
+        perror("Exec failed"); // Print error if exec fails
+        exit(EXIT_FAILURE);
+    }
+    else // Parent process
+    {
+        wait(NULL);
     }
 }
+
 
 void mypipe(char **argv1, char **argv2)
 {
