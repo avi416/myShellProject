@@ -47,11 +47,15 @@ void getLocation()
 
 void logout(char *input)
 {
-
-    free(input);
-    puts("logout");
-    exit(EXIT_SUCCESS);
+    char *trimmed = strtok(input, " \t"); // Trim leading spaces
+    if (trimmed != NULL && strcmp(trimmed, "exit") == 0)
+    {
+        puts("Exiting myShell...");
+        free(input);
+        exit(EXIT_SUCCESS);
+    }
 }
+
 
 void systemCall(char **arguments)
 {
