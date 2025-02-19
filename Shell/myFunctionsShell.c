@@ -264,7 +264,47 @@ void _read(char **args)
     fclose(file);
 }
 
-void wordCount(char **args) {}
+void wordCount(char **args)
+{
+    // Validate input arguments
+    if (args[1] == NULL || args[2] == NULL)
+    {
+        fprintf(stderr, "Usage: wordCount <option> <filename>\nOptions: -l (lines), -w (words), -c (characters)\n");
+        return;
+    }
+
+    FILE *file = fopen(args[2], "r");
+    if (!file)
+    {
+        perror("Error opening file");
+        return;
+    }
+
+    int lines = 0, words = 0, characters = 0;
+    char ch, prev = ' ';
+
+    while ((ch = fgetc(file)) != EOF)
+    {
+        characters++;
+        if (ch == '\n')
+            lines++;
+        if ((ch == ' ' || ch == '\n' || ch == '\t') && prev != ' ' && prev != '\n' && prev != '\t')
+            words++;
+        prev = ch;
+    }
+
+    fclose(file);
+
+    if (strcmp(args[1], "-l") == 0)
+        printf("Lines: %d\n", lines);
+    else if (strcmp(args[1], "-w") == 0)
+        printf("Words: %d\n", words);
+    else if (strcmp(args[1], "-c") == 0)
+        printf("Characters: %d\n", characters);
+    else
+        fprintf(stderr, "Invalid option: %s\nOptions: -l (lines), -w (words), -c (characters)\n", args[1]);
+}
+
 
 void echo(char **arguments)
 {
