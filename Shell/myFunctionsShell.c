@@ -31,12 +31,18 @@ char **splitArguments(char *input)
 void getLocation()
 {
     char location[256];
+    char *user = getenv("USER"); // Get the username
+    char host[256];
+    gethostname(host, sizeof(host)); // Get the hostname
+
     if (getcwd(location, sizeof(location)) == NULL)
     {
         puts("Error");
         return;
     }
-    printf("%s", location);
+
+    // Print location with colors
+    printf("\033[1;32m%s@%s\033[0m:\033[1;34m%s\033[0m$ ", user, host, location);
 }
 
 void logout(char *input)

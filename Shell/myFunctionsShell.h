@@ -4,7 +4,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/wait.h>
+#endif
+
 #define SIZE_BUFF 256
 char *getInputFromUser();
 /**
