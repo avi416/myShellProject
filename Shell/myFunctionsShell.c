@@ -118,13 +118,23 @@ void echo(char **arguments)
 }
 void cd(char **arguments)
 {
+    char path[256] = "";
+    int i = 1;
 
-    if (strncmp(arguments[1], "\"", 1) != 0 && arguments[2] != NULL)
-        printf("-myShell: cd: too many arguments\n");
+    // Concatenate all arguments into a single path string
+    while (arguments[i] != NULL)
+    {
+        strcat(path, arguments[i]);
+        if (arguments[i + 1] != NULL)
+            strcat(path, " "); // Preserve spaces between words
+        i++;
+    }
 
-    else if (chdir(arguments[1]) != 0)
-        printf("-myShell: cd: %s: No such file or directory\n", arguments[1]);
+    // Change directory and handle errors
+    if (chdir(path) != 0)
+        printf("-myShell: cd: %s: No such file or directory\n", path);
 }
+
 void cp(char **arguments)
 {
     char ch;
