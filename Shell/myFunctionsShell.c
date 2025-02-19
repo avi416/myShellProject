@@ -19,14 +19,46 @@ char *getInputFromUser()
 
 char **splitArguments(char *input)
 {
+    char **arguments = malloc(10 * sizeof(char *));
+    char *token;
+    int i = 0;
+    int in_quotes = 0;
 
-    char **arguments = (char **)malloc(sizeof(char *) * 7);
-    arguments[0] = input;
-    arguments[1] = input + 4;
-    arguments[2] = input + 7;
+    token = strtok(input, " ");
+    while (token != NULL)
+    {
+        // Handle quoted arguments
+        if (token[0] == '\"')
+        {
+            arguments[i] = malloc(256);
+            strcpy(arguments[i], token + 1); // Remove first quote
+            in_quotes = 1;
+        }
+        else if (in_quotes)
+        {
+            strcat(arguments[i], " ");
+            strcat(arguments[i], token);
 
-    return NULL;
+            // Close quote
+            if (token[strlen(token) - 1] == '\"')
+            {
+                arguments[i][strlen(arguments[i]) - 1] = '\0'; // Remove last quote
+                in_quotes = 0;
+                i++;
+            }
+        }
+        else
+        {
+            arguments[i++] = token;
+        }
+
+        token = strtok(NULL, " ");
+    }
+    arguments[i] = NULL; // Mark end of arguments
+
+    return arguments;
 }
+
 
 void getLocation()
 {
