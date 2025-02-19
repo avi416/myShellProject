@@ -79,29 +79,58 @@ void systemCall(char **arguments)
 
 void mypipe(char **argv1, char **argv2)
 {
-
     int fd[2];
-
-    if (fork() == 0)
+    
+    // Create a pipe and check for errors
+    if (pipe(fd) == -1)
     {
-        pipe(fd);
-        if (fork() == 0)
-        {
-
-            close(STDOUT_FILENO);
-            dup2(fd[1], STDOUT_FILENO);
-            close(fd[1]);
-            close(fd[0]);
-            execvp(argv1[0], argv1);
-        }
-
-        close(STDIN_FILENO);
-        dup(fd[0]);
-        close(fd[1]);
-        close(fd[0]);
-        execvp(argv2[0], argv2);
+        perror("Pipe failed");
+        return;
     }
+
+    pid_t pid1 = fork();
+    if (pid1 < 0)
+    {
+        perror("Fork failed");
+        return;
+    }
+
+    if (pid1 == 0) // First child process
+    {
+        dup2(fd[1], STDOUT_FILENO); // Redirect stdout to pipe
+        close(fd[0]); // Close unused read end
+        close(fd[1]); // Close write end after duplication
+        execvp(argv1[0], argv1);
+        perror("Exec failed"); // Print error if exec fails
+        exit(1);
+    }
+
+    pid_t pid2 = fork();
+    if (pid2 < 0)
+    {
+        perror("Fork failed");
+        return;
+    }
+
+    if (pid2 == 0) // Second child process
+    {
+        dup2(fd[0], STDIN_FILENO); // Redirect stdin to pipe
+        close(fd[1]); // Close unused write end
+        close(fd[0]); // Close read end after duplication
+        execvp(argv2[0], argv2);
+        perror("Exec failed"); // Print error if exec fails
+        exit(1);
+    }
+
+    // Close pipe ends in parent process
+    close(fd[0]);
+    close(fd[1]);
+
+    // Wait for both child processes to finish
+    wait(NULL);
+    wait(NULL);
 }
+
 
 void move(char **args) {}
 void echoppend(char **args) {}
