@@ -238,7 +238,32 @@ void echowrite(char **args)
     fclose(file);
 }
 
-void _read(char **args) {}
+void _read(char **args)
+{
+    // Validate input arguments
+    if (args[1] == NULL)
+    {
+        fprintf(stderr, "Usage: read <filename>\n");
+        return;
+    }
+
+    FILE *file = fopen(args[1], "r");
+    if (!file)
+    {
+        perror("Error opening file");
+        return;
+    }
+
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        printf("%s", buffer);
+    }
+    printf("\n");
+
+    fclose(file);
+}
+
 void wordCount(char **args) {}
 
 void echo(char **arguments)
