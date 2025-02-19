@@ -178,7 +178,26 @@ void mypipe(char **argv1, char **argv2)
 }
 
 
-void move(char **args) {}
+void move(char **args)
+{
+    // Validate input arguments
+    if (args[1] == NULL || args[2] == NULL)
+    {
+        fprintf(stderr, "Usage: move <source_file> <destination_file>\n");
+        return;
+    }
+
+    // Attempt to rename (move) the file
+    if (rename(args[1], args[2]) == 0)
+    {
+        printf("File '%s' moved successfully to '%s'.\n", args[1], args[2]);
+    }
+    else
+    {
+        perror("Error moving file");
+    }
+}
+
 void echoppend(char **args)
 {
     // Validate input arguments
