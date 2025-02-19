@@ -216,11 +216,21 @@ void wordCount(char **args) {}
 
 void echo(char **arguments)
 {
-    while (*(++arguments))
-        printf("%s ", *arguments);
+    if (arguments[1] == NULL)
+    {
+        printf("\n");
+        return;
+    }
 
-    puts("");
+    for (int i = 1; arguments[i] != NULL; i++)
+    {
+        printf("%s", arguments[i]);
+        if (arguments[i + 1] != NULL)
+            printf(" ");
+    }
+    printf("\n");
 }
+
 void cd(char **arguments)
 {
     char path[256] = "";
