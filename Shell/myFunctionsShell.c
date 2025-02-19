@@ -185,7 +185,26 @@ void echoppend(char **args)
     fclose(file);
 }
 
-void echowrite(char **args) {}
+void echowrite(char **args)
+{
+    // Validate input arguments
+    if (args[1] == NULL || args[2] == NULL)
+    {
+        fprintf(stderr, "Usage: echowrite <text> <filename>\n");
+        return;
+    }
+
+    FILE *file = fopen(args[2], "w"); // Open file in write mode
+    if (!file)
+    {
+        perror("Error opening file");
+        return;
+    }
+
+    fprintf(file, "%s\n", args[1]); // Write text to file
+    fclose(file);
+}
+
 void _read(char **args) {}
 void wordCount(char **args) {}
 
