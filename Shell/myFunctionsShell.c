@@ -252,26 +252,41 @@ void cd(char **arguments)
 
 void cp(char **arguments)
 {
-    char ch;
-    FILE *src, *des;
-    if ((src = fopen(arguments[1], "r")) == NULL)
+    // Validate input arguments
+    if (arguments[1] == NULL || arguments[2] == NULL)
     {
-        puts("error");
+        fprintf(stderr, "Usage: cp <source_file> <destination_file>\n");
         return;
     }
 
-    if ((des = fopen(arguments[2], "w")) == NULL)
+    FILE *source = fopen(arguments[1], "r");
+    if (!source)
     {
-        puts("error");
-        fclose(src);
+        perror("Error opening source file");
         return;
     }
-    while ((ch = fgetc(src)) != EOF)
-        fputc(ch, des);
 
-    fclose(src);
-    fclose(des);
+    FILE *destination = fopen(arguments[2], "w");
+    if (!destination)
+    {
+        perror("Error opening destination file");
+        fclose(source);
+        return;
+    }
+
+    char buffer[1024];
+    size_t bytes;
+    
+    // Copy file contents
+    while ((bytes = fread(buffer, 1, sizeof(buffer), source)) > 0)
+    {
+        fwrite(buffer, 1, bytes, destination);
+    }
+
+    fclose(source);
+    fclose(destination);
 }
+
 void get_dir()
 {
     DIR *dir;
