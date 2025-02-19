@@ -2,20 +2,26 @@
 
 char *getInputFromUser()
 {
+    char *input = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-    char ch;
-    int len = 0;
-    char *input = (char *)malloc(sizeof(char) * (len + 1));
-    *input = '\0';
-    while ((ch = getchar()) != '\n')
+    // Get input from user
+    read = getline(&input, &len, stdin);
+
+    // Handle errors or empty input
+    if (read == -1)
     {
-        *(input + len) = ch;
-        input = (char *)realloc(input, (++len + 1));
+        free(input);
+        return NULL;
     }
-    *(input + len) = '\0';
+
+    // Remove newline character
+    input[strcspn(input, "\n")] = 0;
 
     return input;
 }
+
 
 char **splitArguments(char *input)
 {
