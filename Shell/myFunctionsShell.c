@@ -226,42 +226,101 @@ void move(char **args)
 void echoppend(char **args)
 {
     // Validate input arguments
-    if (args[1] == NULL || args[2] == NULL)
+    if (args[1] == NULL)
     {
-        fprintf(stderr, "Usage: echoppend <text> <filename>\n");
+        fprintf(stderr, "Usage: echoppend <string> >> <filename>\n");
         return;
     }
 
-    FILE *file = fopen(args[2], "a"); // Open file in append mode
+    // Find the ">>" symbol in the arguments
+    int i = 1;
+    while (args[i] != NULL && strcmp(args[i], ">>") != 0)
+    {
+        i++;
+    }
+
+    // Check if ">>" and filename exist
+    if (args[i] == NULL || args[i + 1] == NULL)
+    {
+        fprintf(stderr, "Usage: echoppend <string> >> <filename>\n");
+        return;
+    }
+
+    // Open the file in append mode
+    FILE *file = fopen(args[i + 1], "a");
     if (!file)
     {
         perror("Error opening file");
         return;
     }
 
-    fprintf(file, "%s\n", args[1]); // Write text to file
+    // Write the string to the file
+    for (int j = 1; j < i; j++)
+    {
+        fprintf(file, "%s", args[j]);
+        if (j < i - 1)
+            fprintf(file, " ");
+    }
+    fprintf(file, "\n");
+
     fclose(file);
 }
+
+
+
+
+
+
 
 void echowrite(char **args)
 {
     // Validate input arguments
-    if (args[1] == NULL || args[2] == NULL)
+    if (args[1] == NULL)
     {
-        fprintf(stderr, "Usage: echowrite <text> <filename>\n");
+        fprintf(stderr, "Usage: echowrite <string> > <filename>\n");
         return;
     }
 
-    FILE *file = fopen(args[2], "w"); // Open file in write mode
+    // Find the ">" symbol in the arguments
+    int i = 1;
+    while (args[i] != NULL && strcmp(args[i], ">") != 0)
+    {
+        i++;
+    }
+
+    // Check if ">" and filename exist
+    if (args[i] == NULL || args[i + 1] == NULL)
+    {
+        fprintf(stderr, "Usage: echowrite <string> > <filename>\n");
+        return;
+    }
+
+    // Open the file in write mode
+    FILE *file = fopen(args[i + 1], "w");
     if (!file)
     {
         perror("Error opening file");
         return;
     }
 
-    fprintf(file, "%s\n", args[1]); // Write text to file
+    // Write the string to the file
+    for (int j = 1; j < i; j++)
+    {
+        fprintf(file, "%s", args[j]);
+        if (j < i - 1)
+            fprintf(file, " "); // Add spaces between words
+    }
+    fprintf(file, "\n");
+
     fclose(file);
 }
+
+
+
+
+
+
+
 
 void _read(char **args)
 {
@@ -339,14 +398,49 @@ void echo(char **arguments)
         return;
     }
 
+    int redirectIndex = -1;
+
     for (int i = 1; arguments[i] != NULL; i++)
     {
-        printf("%s", arguments[i]);
-        if (arguments[i + 1] != NULL)
-            printf(" ");
+        if (strcmp(arguments[i], ">") == 0 && arguments[i + 1] != NULL)
+        {
+            redirectIndex = i;
+            break;
+        }
     }
-    printf("\n");
+
+    if (redirectIndex != -1)
+    {
+        FILE *file = fopen(arguments[redirectIndex + 1], "w"); 
+        if (!file)
+        {
+            perror("Error opening file");
+            return;
+        }
+
+        for (int i = 1; i < redirectIndex; i++)
+        {
+            fprintf(file, "%s", arguments[i]);
+            if (i + 1 < redirectIndex)
+                fprintf(file, " ");
+        }
+        fprintf(file, "\n");
+
+        fclose(file);
+        printf("Text written to file: %s\n", arguments[redirectIndex + 1]);
+    }
+    else 
+    {
+        for (int i = 1; arguments[i] != NULL; i++)
+        {
+            printf("%s", arguments[i]);
+            if (arguments[i + 1] != NULL)
+                printf(" ");
+        }
+        printf("\n");
+    }
 }
+
 
 void cd(char **arguments)
 {
@@ -390,32 +484,44 @@ void cp(char **arguments)
         return;
     }
 
-    FILE *source = fopen(arguments[1], "r");
+    // Open source file
+    FILE *source = fopen(arguments[1], "rb");
     if (!source)
     {
-        perror("Error opening source file");
+        fprintf(stderr, "Error opening source file: %s\n", arguments[1]);
+        perror("Error");
         return;
     }
 
-    FILE *destination = fopen(arguments[2], "w");
+    // Open destination file
+    FILE *destination = fopen(arguments[2], "wb");
     if (!destination)
     {
-        perror("Error opening destination file");
+        fprintf(stderr, "Error opening destination file: %s\n", arguments[2]);
+        perror("Error");
         fclose(source);
         return;
     }
 
     char buffer[1024];
     size_t bytes;
-    
+
     // Copy file contents
     while ((bytes = fread(buffer, 1, sizeof(buffer), source)) > 0)
     {
-        fwrite(buffer, 1, bytes, destination);
+        if (fwrite(buffer, 1, bytes, destination) != bytes)
+        {
+            fprintf(stderr, "Error writing to destination file: %s\n", arguments[2]);
+            perror("Error");
+            fclose(source);
+            fclose(destination);
+            return;
+        }
     }
 
     fclose(source);
     fclose(destination);
+    printf("File copied successfully: %s -> %s\n", arguments[1], arguments[2]);
 }
 
 void get_dir()
@@ -430,9 +536,13 @@ void get_dir()
         return;
     }
 
+    int count = 0;
     while ((entry = readdir(dir)) != NULL)
     {
-        printf("%s  ", entry->d_name);
+        printf("%s\t", entry->d_name);
+        count++;
+        if (count % 5 == 0) // Print 5 per row for readability
+            printf("\n");
     }
     printf("\n");
 
