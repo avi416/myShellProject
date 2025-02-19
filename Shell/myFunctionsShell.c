@@ -165,7 +165,26 @@ void mypipe(char **argv1, char **argv2)
 
 
 void move(char **args) {}
-void echoppend(char **args) {}
+void echoppend(char **args)
+{
+    // Validate input arguments
+    if (args[1] == NULL || args[2] == NULL)
+    {
+        fprintf(stderr, "Usage: echoppend <text> <filename>\n");
+        return;
+    }
+
+    FILE *file = fopen(args[2], "a"); // Open file in append mode
+    if (!file)
+    {
+        perror("Error opening file");
+        return;
+    }
+
+    fprintf(file, "%s\n", args[1]); // Write text to file
+    fclose(file);
+}
+
 void echowrite(char **args) {}
 void _read(char **args) {}
 void wordCount(char **args) {}
