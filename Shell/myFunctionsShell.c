@@ -290,16 +290,24 @@ void cp(char **arguments)
 void get_dir()
 {
     DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir("./")) == NULL)
+    struct dirent *entry;
+
+    dir = opendir("."); // Open current directory
+    if (!dir)
     {
-        perror("");
+        perror("Error opening directory");
         return;
     }
-    while ((ent = readdir(dir)) != NULL)
-        printf("%s ", ent->d_name);
-    puts("");
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        printf("%s  ", entry->d_name);
+    }
+    printf("\n");
+
+    closedir(dir);
 }
+
 void delete(char **arguments)
 {
     if (unlink(arguments[1]) != 0)
