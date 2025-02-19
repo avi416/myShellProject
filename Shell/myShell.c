@@ -3,7 +3,6 @@
 
 int main(int argc, char const *argv[])
 {
-
     welcome();
     while (1)
     {
@@ -16,17 +15,19 @@ int main(int argc, char const *argv[])
         char *input = getInputFromUser();
         puts(input);
         
-        if (strncmp(input, "exit",4) == 0)
+        if (strncmp(input, "exit", 4) == 0)
         {
-            puts("Exit");
-            logout(input);
+             puts("Exit");
+             free(input);  
+             exit(0);
         }
 
         char **arguments = splitArguments(input);
 
-        if (strcmp(input, "cd") == 0)
+        if (strcmp(arguments[0], "cd") == 0)
         {
-            cd(arguments);
+              cd(arguments);
+               continue;
         }
         else if (strncmp(input, "echo",4) == 0)
         {
@@ -53,6 +54,18 @@ int main(int argc, char const *argv[])
         {
             mypipe(arguments, arguments + isPipe + 1);
         }
+        else if (strcmp(arguments[0], "clean") == 0)
+        {
+            int status = system("make clean");
+            if (status == -1)
+            {
+                perror("Error running make clean");
+            }
+            else
+            {
+                printf("Temporary files removed.\n");
+            }
+        }
         else
         {
             systemCall(arguments);
@@ -64,35 +77,35 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
+
 void welcome()
 {
-    char *logo[] = {"                     aRTI//BARK             ____\n",
-                    "             simpleSH//////////Shl         |B//S|", "    |\n",
-                    "          SH//////YS           shell//Sh   |A@@I|", "    | Welcome to simple shell\n",
-                    " Sim aSystemSH//Sh              sys//B     |R$$M|", "    | Version 1.0\n",
-                    " ArtABBBaraKk///Sh               sM//E     |A^^P|", "    |\n",
-                    "         pCCCCY//h          eSS@@ y//E     |K**L|", "    | https://github.com/BSharabi\n",
-                    "         SPPPP///a          pP///AC//E     |&&&E|", "    |\n",
-                    "              A//A            smP////S     |A**S|", "    | Have fun!\n",
-                    "              p///Ac            sE///a     |R##H|", "    |\n",
-                    "              P////YCpc           L//L     |T!!E|", "    | Wanna support simple shell?\n",
-                    "       scccccp///pSP///p          p//l     |I%%L|", "    |\n",
-                    "      sY/////////y  caa           S//h     |U--L|", "    |\n",
-                    "       shsSellH//Ya              pY/Sh     |MIGT|", "    |\n",
-                    "        sH/ShS////YCc          aC//Yp      |____|", "    |\n",
-                    "         Si  shlll//SHsimpleSH//LSs\n",
-                    "                  shell//////IPSHs\n",
-                    "                       artium\n", '\0'};
-    int i = 0;
-
-    do
-    {
-        printf("%s", logo[i++]);
-        // if (i % 2 != 0 || i > 26)
-        //     green();
-        // else
-        //     blue();
-    } while (logo[i]);
-    // reset();
-    puts("\n");
+    printf("\033[1;33m"); 
+    printf("                              __\n");
+    printf("                            .d$$b         \033[1;34mAvi Mahari\033[1;33m\n");
+    printf("                          .' TO$;\\       \033[1;32mAvi Mahari's Shell\033[1;33m\n");
+    printf("                         /  : TP._;      --------------------------\n");
+    printf("                        / _.;  :Tb|      \033[1;32mCustomized Terminal\033[1;33m\n");
+    printf("                       /   /   ;j$j      \033[1;36mAvi Mahari Power\033[1;33m\n");
+    printf("                   _.-\"       d$$$$      --------------------------\n");
+    printf("                 .' ..       d$$$$;      \033[1;35mDesigned by Avi Mahari\033[1;33m\n");
+    printf("                /  /P'      d$$$$P. |\n");
+    printf("               /   \"      .d$$$P' |\\^\"l   \033[1;34mCode like a lion! - Avi Mahari\033[1;33m\n");
+    printf("             .'           `T$P^\"\"\"\"\"  :\n");
+    printf("         ._.'      _.'                ;\n");
+    printf("      `-.-\".-'-' ._.       _.-\"    .-\"   \033[1;32mAvi Mahari: The Legend\033[1;33m\n");
+    printf("    `.-\" _____  ._              .-\"\n");
+    printf("   -(.g$$$$$$$b.              .'      \033[1;36mType 'help' for info - Avi Mahari\033[1;33m\n");
+    printf("     \"\"^^T$$$P^)            .(:\n");
+    printf("       _/  -\"  /.'         /:/;\n");
+    printf("    ._.'-'`-'  \")/         /;/;\n");
+    printf(" `-.-\"..--\"\"   \" /         /  ;\n");
+    printf(".-\" ..--\"\"        -'          :\n");
+    printf("..--\"\"--.-\"         (\\      .-(\\\n");
+    printf("  ..--\"\"              `-\\(\\/;\n");
+    printf("    _.                      :\n");
+    printf("                            ;`-\n");
+    printf("                           :\\\n");
+    printf("                           ;\n");
+    printf("\033[0m"); 
 }
