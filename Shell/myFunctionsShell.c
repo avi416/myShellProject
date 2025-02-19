@@ -1,5 +1,7 @@
 #include "myFunctionsShell.h"
 
+
+
 char *getInputFromUser()
 {
     char *input = NULL;
@@ -66,22 +68,45 @@ char **splitArguments(char *input)
 }
 
 
+/**
+ * Prints the current working directory along with the username and hostname.
+ */
 void getLocation()
 {
     char location[256];
-    char *user = getenv("USER"); // Get the username
+    char *user = getenv("USER");
     char host[256];
-    gethostname(host, sizeof(host)); // Get the hostname
+
+    if (user == NULL)
+    {
+        user = getenv("USERNAME");
+        if (user == NULL)
+        {
+            user = "unknown";
+        }
+    }
+
+    if (gethostname(host, sizeof(host)) != 0)
+    {
+        strcpy(host, "unknown");
+    }
 
     if (getcwd(location, sizeof(location)) == NULL)
     {
-        puts("Error");
+        perror("getcwd failed");
         return;
     }
 
-    // Print location with colors
+    // צבעים מיוחדים כאשר אתה בתוך myshell
+    printf("\033[1;35m(MyShell)\033[0m ");
     printf("\033[1;32m%s@%s\033[0m:\033[1;34m%s\033[0m$ ", user, host, location);
+    fflush(stdout);
 }
+
+
+
+
+
 
 void logout(char *input)
 {
@@ -326,20 +351,34 @@ void echo(char **arguments)
 void cd(char **arguments)
 {
     char path[256] = "";
-    int i = 1;
 
-    // Concatenate all arguments into a single path string
-    while (arguments[i] != NULL)
+    // If no argument is provided, go to home directory
+    if (arguments[1] == NULL)
     {
-        strcat(path, arguments[i]);
-        if (arguments[i + 1] != NULL)
-            strcat(path, " "); // Preserve spaces between words
-        i++;
+        const char *home = getenv("HOME");
+        if (home == NULL)
+        {
+            fprintf(stderr, "-myShell: cd: HOME not set\n");
+            return;
+        }
+        strcpy(path, home);
+    }
+    else
+    {
+        // Concatenate all arguments into a single path string
+        int i = 1;
+        while (arguments[i] != NULL)
+        {
+            strcat(path, arguments[i]);
+            if (arguments[i + 1] != NULL)
+                strcat(path, " "); // Preserve spaces between words
+            i++;
+        }
     }
 
-    // Change directory and handle errors
+    // Attempt to change directory and handle errors
     if (chdir(path) != 0)
-        printf("-myShell: cd: %s: No such file or directory\n", path);
+        perror("-myShell: cd");
 }
 
 void cp(char **arguments)
