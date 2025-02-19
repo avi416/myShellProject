@@ -310,6 +310,21 @@ void get_dir()
 
 void delete(char **arguments)
 {
-    if (unlink(arguments[1]) != 0)
-        printf("-myShell: delete: %s: No such file or directory\n", arguments[1]);
+    // Validate input arguments
+    if (arguments[1] == NULL)
+    {
+        fprintf(stderr, "Usage: delete <filename>\n");
+        return;
+    }
+
+    // Attempt to remove the file
+    if (remove(arguments[1]) == 0)
+    {
+        printf("File '%s' deleted successfully.\n", arguments[1]);
+    }
+    else
+    {
+        perror("Error deleting file");
+    }
 }
+
