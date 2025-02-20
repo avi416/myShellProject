@@ -70,6 +70,11 @@ int main(void)
                 else
                     echo(arguments);
             }
+            else if (strcmp(arguments[0], "wordCount") == 0)
+            {
+                 wordCount(arguments);
+            }
+
             else if (strcmp(arguments[0], "cp") == 0)
             {
                 cp(arguments);
