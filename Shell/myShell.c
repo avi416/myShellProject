@@ -7,9 +7,10 @@ int main(void)
 
     while (1)
     {
-        getLocation();  
-        char *input = getInputFromUser();  
-        if (!input)
+        getLocation();
+
+        char *input = getInputFromUser();
+        if (!input) 
             continue; 
 
         if (strncmp(input, "exit", 4) == 0)
@@ -22,66 +23,68 @@ int main(void)
         if (!arguments || !arguments[0])
         {
             free(input);
-            continue;
+            if (arguments) free(arguments);
+            continue; 
         }
 
-   
-        if (strcmp(arguments[0], "cd") == 0)
+       
+        int pipeIndex = -1;
+        for (int i = 0; arguments[i] != NULL; i++)
         {
-            cd(arguments);
-        }
-        else if (strcmp(arguments[0], "echo") == 0)
-        {
-           
-            int appendIndex = -1;
-            int writeIndex  = -1;
-            for (int i = 1; arguments[i] != NULL; i++)
+            if (strcmp(arguments[i], "|") == 0)
             {
-                if (strcmp(arguments[i], ">>") == 0)
-                    appendIndex = i;
-                else if (strcmp(arguments[i], ">") == 0)
-                    writeIndex = i;
+                pipeIndex = i;
+                break;
             }
+        }
 
-            if (appendIndex != -1)
-                echoppend(arguments);
-            else if (writeIndex != -1)
-                echowrite(arguments);
-            else
-                echo(arguments);
-        }
-        else if (strcmp(arguments[0], "cp") == 0)
+        if (pipeIndex != -1)
         {
-            cp(arguments);
-        }
-        else if (strcmp(arguments[0], "move") == 0)
-        {
-            move(arguments);
-        }
-        else if (strcmp(arguments[0], "delete") == 0)
-        {
-            delete(arguments);
-        }
-        else if (strcmp(arguments[0], "dir") == 0)
-        {
-            get_dir();
+          
+            arguments[pipeIndex] = NULL;
+            mypipe(arguments, &arguments[pipeIndex + 1]);
         }
         else
         {
-
-            int pipeIndex = -1;
-            for (int i = 0; arguments[i] != NULL; i++)
+            
+            if (strcmp(arguments[0], "cd") == 0)
             {
-                if (strcmp(arguments[i], "|") == 0)
-                {
-                    pipeIndex = i;
-                    break;
-                }
+                cd(arguments);
             }
-            if (pipeIndex != -1)
+            else if (strcmp(arguments[0], "echo") == 0)
             {
-                arguments[pipeIndex] = NULL; 
-                mypipe(arguments, &arguments[pipeIndex+1]);
+                int appendIndex = -1;
+                int writeIndex  = -1;
+                for (int i = 1; arguments[i] != NULL; i++)
+                {
+                    if (strcmp(arguments[i], ">>") == 0)
+                        appendIndex = i;
+                    else if (strcmp(arguments[i], ">") == 0)
+                        writeIndex = i;
+                }
+
+                if (appendIndex != -1)
+                    echoppend(arguments);
+                else if (writeIndex != -1)
+                    echowrite(arguments);
+                else
+                    echo(arguments);
+            }
+            else if (strcmp(arguments[0], "cp") == 0)
+            {
+                cp(arguments);
+            }
+            else if (strcmp(arguments[0], "move") == 0)
+            {
+                move(arguments);
+            }
+            else if (strcmp(arguments[0], "delete") == 0)
+            {
+                delete(arguments);
+            }
+            else if (strcmp(arguments[0], "dir") == 0)
+            {
+                get_dir();
             }
             else
             {
@@ -98,7 +101,6 @@ int main(void)
     return 0;
 }
 
-
 void welcome()
 {
     printf("\033[1;33m"); 
@@ -111,12 +113,12 @@ void welcome()
     printf("                   _.-\"       d$$$$      --------------------------\n");
     printf("                 .' ..       d$$$$;      \033[1;35mDesigned by Avi Mahari\033[1;33m\n");
     printf("                /  /P'      d$$$$P. |\n");
-    printf("               /   \"      .d$$$P' |\\^\"l   \033[1;34mCode like a lion! - Avi Mahari\033[1;33m\n");
+    printf("               /   \"      .d$$$P' |\\^\"l   \n");
     printf("             .'           `T$P^\"\"\"\"\"  :\n");
     printf("         ._.'      _.'                ;\n");
     printf("      `-.-\".-'-' ._.       _.-\"    .-\"   \033[1;32mAvi Mahari: The Legend\033[1;33m\n");
     printf("    `.-\" _____  ._              .-\"\n");
-    printf("   -(.g$$$$$$$b.              .'      \033[1;36mType 'help' for info - Avi Mahari\033[1;33m\n");
+    printf("   -(.g$$$$$$$b.              .'      \n");
     printf("     \"\"^^T$$$P^)            .(:\n");
     printf("       _/  -\"  /.'         /:/;\n");
     printf("    ._.'-'`-'  \")/         /;/;\n");
