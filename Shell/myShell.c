@@ -1,82 +1,103 @@
 #include "myShell.h"
 #include "myFunctionsShell.h"
 
-int main(int argc, char const *argv[])
+int main(void)
 {
     welcome();
+
     while (1)
     {
-        int isPipe = 2;
-        int isEchoWrith = 0;
-        int isEchoPpend = 0;
+        getLocation();  
+        char *input = getInputFromUser();  
+        if (!input)
+            continue; 
 
-        getLocation();
-
-        char *input = getInputFromUser();
-        puts(input);
-        
         if (strncmp(input, "exit", 4) == 0)
         {
-             puts("Exit");
-             free(input);  
-             exit(0);
+            free(input);
+            break;
         }
 
         char **arguments = splitArguments(input);
+        if (!arguments || !arguments[0])
+        {
+            free(input);
+            continue;
+        }
 
+   
         if (strcmp(arguments[0], "cd") == 0)
         {
-              cd(arguments);
-               continue;
+            cd(arguments);
         }
-        else if (strncmp(input, "echo",4) == 0)
+        else if (strcmp(arguments[0], "echo") == 0)
         {
-            if (isEchoWrith)
-                echowrite(arguments);
-            else if (isEchoPpend)
+           
+            int appendIndex = -1;
+            int writeIndex  = -1;
+            for (int i = 1; arguments[i] != NULL; i++)
+            {
+                if (strcmp(arguments[i], ">>") == 0)
+                    appendIndex = i;
+                else if (strcmp(arguments[i], ">") == 0)
+                    writeIndex = i;
+            }
+
+            if (appendIndex != -1)
                 echoppend(arguments);
+            else if (writeIndex != -1)
+                echowrite(arguments);
             else
                 echo(arguments);
         }
-        else if (strcmp(input, "cp") == 0)
+        else if (strcmp(arguments[0], "cp") == 0)
         {
             cp(arguments);
         }
-        else if (strcmp(input, "delete") == 0)
+        else if (strcmp(arguments[0], "move") == 0)
+        {
+            move(arguments);
+        }
+        else if (strcmp(arguments[0], "delete") == 0)
         {
             delete(arguments);
         }
-        else if (strcmp(input, "dir") == 0)
+        else if (strcmp(arguments[0], "dir") == 0)
         {
             get_dir();
         }
-        else if (isPipe)
+        else
         {
-            mypipe(arguments, arguments + isPipe + 1);
-        }
-        else if (strcmp(arguments[0], "clean") == 0)
-        {
-            int status = system("make clean");
-            if (status == -1)
+
+            int pipeIndex = -1;
+            for (int i = 0; arguments[i] != NULL; i++)
             {
-                perror("Error running make clean");
+                if (strcmp(arguments[i], "|") == 0)
+                {
+                    pipeIndex = i;
+                    break;
+                }
+            }
+            if (pipeIndex != -1)
+            {
+                arguments[pipeIndex] = NULL; 
+                mypipe(arguments, &arguments[pipeIndex+1]);
             }
             else
             {
-                printf("Temporary files removed.\n");
+                systemCall(arguments);
             }
         }
-        else
-        {
-            systemCall(arguments);
-            wait(NULL);
-        }
 
+        for (int i = 0; arguments[i] != NULL; i++)
+            free(arguments[i]);
+        free(arguments);
         free(input);
     }
 
     return 0;
 }
+
 
 void welcome()
 {
