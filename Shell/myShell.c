@@ -74,6 +74,11 @@ int main(void)
             {
                 cp(arguments);
             }
+            else if (strcmp(arguments[0], "read") == 0)
+            {
+               _read(arguments);
+            }
+
             else if (strcmp(arguments[0], "move") == 0)
             {
                 move(arguments);
