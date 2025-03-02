@@ -164,19 +164,29 @@ void getLocation()
 }
 
 
+int isExitValue(char *args)
+{
+    if (args == NULL)
+        return 0;
+
+    // Trim whitespace if needed
+    while (*args == ' ') args++;
+
+    return (strcmp(args, "exit") == 0);
+}
+
+
 
 
 
 
 void logout(char *input)
 {
-    char *trimmed = strtok(input, " \t"); // Trim leading spaces
-    if (trimmed != NULL && strcmp(trimmed, "exit") == 0)
-    {
-        puts("Exiting myShell...");
+    if (input)
         free(input);
-        exit(EXIT_SUCCESS);
-    }
+
+    puts("Exiting shell... Goodbye!");
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -358,7 +368,7 @@ void echowrite(char **args)
 
 void _read(char **args)
 {
-    // Validate input arguments
+   
     if (args[1] == NULL)
     {
         fprintf(stderr, "Usage: read <filename>\n");

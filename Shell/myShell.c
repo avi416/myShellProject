@@ -13,11 +13,10 @@ int main(void)
         if (!input) 
             continue; 
 
-        if (strncmp(input, "exit", 4) == 0)
+        if (isExitValue(input))
         {
-            free(input);
-            break;
-        }
+            logout(input);
+         }
 
         char **arguments = splitArguments(input);
         if (!arguments || !arguments[0])

@@ -60,11 +60,18 @@ char **splitArguments(char *);
 void getLocation();
 
 /**
- * Logs out of the shell if the command "exit" is entered.
+ * Checks if the given command is an exit command.
  *
- * This function checks if the provided input is "exit" and terminates the shell session if true.
+ * @param args The user input command.
+ * @return 1 if it's an exit command, otherwise 0.
+ */
+
+int isExitValue(char *args);
+
+/**
+ * Handles the logout process by freeing the input string and exiting the shell.
  *
- * @param input The command entered by the user.
+ * @param input The input string to free.
  */
 void logout(char *input);
 
